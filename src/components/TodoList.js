@@ -4,7 +4,14 @@ import Sidebar from './Sidebar';
 class TodoList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {itemLists: [[]], listTitles: ['Chores For Today'], currentList: 0};
+    const itemLists = JSON.parse(localStorage.getItem("itemLists"));
+    const listTitles = JSON.parse(localStorage.getItem("listTitles"));
+    const currentList = JSON.parse(localStorage.getItem("currentList"));
+    this.state = {
+      itemLists: (itemLists || [[]]), 
+      listTitles: (listTitles || ['Chores For Today']), 
+      currentList: (currentList || 0)
+    };
     this.handleItemSubmit = this.handleItemSubmit.bind(this);
     this.handleListChange = this.handleListChange.bind(this);
     this.handleListCreate = this.handleListCreate.bind(this);
@@ -71,6 +78,12 @@ class TodoList extends React.Component {
 	render() {
     const itemList = this.state.itemLists[this.state.currentList]; 
     const lTitle = this.state.listTitles[this.state.currentList];
+
+    // Use effect might be better for this use case, but the performance difference seems negligible
+    localStorage.setItem("itemLists", JSON.stringify(this.state.itemLists));
+    localStorage.setItem("listTitles", JSON.stringify(this.state.listTitles));
+    localStorage.setItem("currentList", JSON.stringify(this.state.currentList));
+
 		return (
       <div className="container">
         <div className="TodoList">
