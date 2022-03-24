@@ -5,7 +5,6 @@ import './components/TodoList.css';
 import './components/Sidebar.css';
 import reportWebVitals from './reportWebVitals';
 import TodoList from './components/TodoList';
-import Sidebar from './components/Sidebar';
 
 ReactDOM.render(
   <TodoList />,

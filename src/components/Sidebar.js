@@ -20,15 +20,15 @@ class ListsTodo extends React.Component {
   }
 
   handleClick(event) {
-    const listName = event.target.textContent;
-    const index = this.getIndex(listName);
+    const listId = event.target.id;
+    const index = this.getIndex(listId);
     this.props.onClick(index);
   }
 
-  getIndex(textContent) {
+  getIndex(titleId) {
     const items = this.props.items;
     for (var i = 0; i < items.length; i++) {
-      if (textContent === this.shorten(items[i])) {
+      if (titleId === items[i].id) {
         return i;
       }
     }
@@ -39,11 +39,23 @@ class ListsTodo extends React.Component {
   }
 
   render() {
-    const items = this.props.items.map((item) => <li onClick={this.handleClick}>{this.shorten(item)}</li>);
+    const items = this.props.items.map((item) => {
+      return <SidebarItem key={item.id} id={item.id} onClick={this.handleClick}>{this.shorten(item.title)}</SidebarItem>;
+    });
     return (
       <ul className="ListsTodo">
         {items} 
       </ul>
+    );
+  }
+}
+
+class SidebarItem extends React.Component {
+  render() {
+    return (
+      <li onClick={this.props.onClick} id={this.props.id}>
+        {this.props.children}
+      </li>
     );
   }
 }

@@ -42,8 +42,24 @@
   border-radius: 30px;
 }
 
+.listDelete {
+  background: var(--main-button-grdnt);
+  display: inline;
+  position: absolute;
+  right: 0;
+  width: 30px;
+  padding: 0 15px;
+  margin: 0 15px;
+  border-radius: 10px;
+}
+
+.listDelete:hover {
+  cursor: pointer;
+}
+
 .ListTitle {
   font-size: 40px;
+  display: inline;
   border-bottom: 1px solid black;
   background-color: var(--main-bg-highlight);
   width: 100%;

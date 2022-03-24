@@ -1,3 +1,7 @@
+:root {
+  --list-icon-size: 50px;
+}
+
 .Sidebar {
   display: flex;
   padding: 15px;
@@ -17,11 +21,18 @@
 }
 
 .Sidebar button {
-  width: 60px;
-  height: 60px;
+  -webkit-appearance: none;
+  width: var(--list-icon-size);
+  height: var(--list-icon-size);
   border-radius: 100%;
   border: 1px solid black;
-  font-size: 50px;
+  font-size: 43px;
+  line-height: 0.9;
+  text-align: center;
+}
+
+.Sidebar button {
+  cursor: pointer;
 }
 
 .Sidebar ul {
@@ -31,12 +42,12 @@
 }
 
 .Sidebar li {
-  width: 60px;
-  height: 60px;
+  width: var(--list-icon-size);
+  height: var(--list-icon-size);
   background-color: #FFFFFF;
   border: 1px solid black;
   text-align: center;
-  line-height: 3.8;
+  line-height: 3.1;
   padding: 0;
   margin: 15px 0;
   border-radius: 100%;

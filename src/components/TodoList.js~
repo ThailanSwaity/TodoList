@@ -1,5 +1,6 @@
 import React from 'react';
 import Sidebar from './Sidebar';
+import { v4 as uuidv4 } from 'uuid';
 
 class TodoList extends React.Component {
   constructor(props) {
@@ -7,23 +8,46 @@ class TodoList extends React.Component {
     const itemLists = JSON.parse(localStorage.getItem("itemLists"));
     const listTitles = JSON.parse(localStorage.getItem("listTitles"));
     const currentList = JSON.parse(localStorage.getItem("currentList"));
+    const newListTitleId = uuidv4();
     this.state = {
       itemLists: (itemLists || [[]]), 
-      listTitles: (listTitles || ['Chores For Today']), 
+      listTitles: (listTitles || [{title: 'Chores For Today', id: newListTitleId}]), 
       currentList: (currentList || 0)
     };
     this.handleItemSubmit = this.handleItemSubmit.bind(this);
     this.handleListChange = this.handleListChange.bind(this);
     this.handleListCreate = this.handleListCreate.bind(this);
     this.handleListClick = this.handleListClick.bind(this);
+    this.handleListDelete = this.handleListDelete.bind(this);
   }
-  
-  handleListClick(itemTitle) {
+ 
+  // List deletion added, but must implement a check for when the last list is deleted
+  handleListDelete() {
+    this.setState(function(prevState, props) {
+      const index = prevState.currentList;
+      var iLists = [];
+      var lTitles = [];
+      for (var i = 0; i < prevState.itemLists.length; i++) {
+        if (i != index) {
+          iLists.push(prevState.itemLists[i]);
+          lTitles.push(prevState.listTitles[i]);
+        }
+      }
+      const cList = (prevState.currentList <= 0) ? 0 : (prevState.currentList - 1);
+      return {
+        itemLists: iLists,
+        listTitles: lTitles,
+        currentList: cList
+      }
+    });
+  }
+
+  handleListClick(itemId) {
     this.setState(function(prevState, props) {
       const iList = prevState.itemLists[prevState.currentList];
-      const index = this.getListItemIndex(prevState, itemTitle);
+      const index = this.getListItemIndex(prevState, itemId);
       const aList = [...iList.slice(0, index), 
-        {body: iList[index].body, color: iList[index].color, done: !iList[index].done}, 
+        {body: iList[index].body, color: iList[index].color, done: !iList[index].done, id: iList[index].id}, 
         ...iList.slice(index + 1)];
       return {
         itemLists: [
@@ -35,10 +59,10 @@ class TodoList extends React.Component {
     });
   }
 
-  getListItemIndex(prevState, itemTitle) {
+  getListItemIndex(prevState, itemId) {
     const iList = prevState.itemLists[prevState.currentList];
     for (var i = 0; i < iList.length; i++) {
-      if (iList[i].body == itemTitle) {
+      if (iList[i].id == itemId) {
         return i;
       }
     }
@@ -48,10 +72,11 @@ class TodoList extends React.Component {
     event.preventDefault();
     this.setState(function(prevState, props) {
       const newListIndex = prevState.itemLists.length;
+      const newListTitleId = uuidv4();
       return {
         currentList: newListIndex,
         itemLists: [...prevState.itemLists, []],
-        listTitles: [...prevState.listTitles, `L${newListIndex}st`]
+        listTitles: [...prevState.listTitles, {title: `L${newListIndex}st`, id: newListTitleId}]
       }
     });
   }
@@ -59,7 +84,8 @@ class TodoList extends React.Component {
   handleItemSubmit(value) {
     this.setState(function(prevState, props) {
       const index = prevState.currentList;
-      const iList = [...prevState.itemLists[index], {body: value, color: '#000000', done: false}];
+      const uuid = uuidv4();
+      const iList = [...prevState.itemLists[index], {body: value, color: '#000000', done: false, id: uuid}];
 
       return {
         itemLists: [
@@ -77,7 +103,7 @@ class TodoList extends React.Component {
 
 	render() {
     const itemList = this.state.itemLists[this.state.currentList]; 
-    const lTitle = this.state.listTitles[this.state.currentList];
+    const lTitle = this.state.listTitles[this.state.currentList].title;
 
     // Use effect might be better for this use case, but the performance difference seems negligible
     localStorage.setItem("itemLists", JSON.stringify(this.state.itemLists));
@@ -86,12 +112,12 @@ class TodoList extends React.Component {
 
 		return (
       <div className="container">
+        <Sidebar listTitles={this.state.listTitles} onListCreate={this.handleListCreate} onListChange={this.handleListChange} />
         <div className="TodoList">
-          <ListTitle>{lTitle}</ListTitle>
+          <ListTitle onClick={this.handleListDelete}>{lTitle}</ListTitle>
           <ItemList items={itemList} onClick={this.handleListClick}/>
           <SubmissionBox onSubmit={this.handleItemSubmit} />
         </div>
-        <Sidebar listTitles={this.state.listTitles} onListCreate={this.handleListCreate} onListChange={this.handleListChange} />
       </div>
 		);
 	}	
@@ -102,6 +128,9 @@ class ListTitle extends React.Component {
 		return (
 			<div className="ListTitle">
 				{this.props.children}
+        <div class="listDelete" onClick={this.props.onClick}>
+          X
+        </div>
 			</div>
 		);
 	}
@@ -113,13 +142,15 @@ class ItemList extends React.Component {
     this.handleClick = this.handleClick.bind(this);
   }
   
-  handleClick(itemBody) {
-    this.props.onClick(itemBody);
+  handleClick(itemId) {
+    this.props.onClick(itemId);
   }
 
 	render() {
-		const todoItems = this.props.items.map((item) => <ListItem onClick={this.handleClick} itemDetail={item} />);
-		return (
+		const todoItems = this.props.items.map((item) => {
+      return <ListItem key={item.id} id={item.id} onClick={this.handleClick} itemDetail={item} />;
+    });
+    return (
 			<ul className="ItemList">
 				{todoItems}
 			</ul>
@@ -137,7 +168,7 @@ class ListItem extends React.Component {
   }
 
   handleClick(event) {
-    this.props.onClick(event.target.textContent);
+    this.props.onClick(event.target.id);
   }
 
 	render() {
@@ -145,7 +176,7 @@ class ListItem extends React.Component {
 		const itemBody = this.props.itemDetail.body;
     const done = this.props.itemDetail.done ? 'done' : '';
 		return (
-			<li className={"ListItem " + done} onClick={this.handleClick} style={{ color: {color} }}>
+			<li className={"ListItem " + done} id={this.props.id} onClick={this.handleClick} style={{ color: {color} }}>
 				{itemBody}
 			</li>
 		);
