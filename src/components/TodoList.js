@@ -75,7 +75,6 @@ class TodoList extends React.Component {
       const newListIndex = prevState.itemLists.length;
       const newListTitleId = uuidv4();
       return {
-        currentList: newListIndex,
         itemLists: [...prevState.itemLists, []],
         listTitles: [...prevState.listTitles, {title: `L${newListIndex}st`, id: newListTitleId}]
       }
@@ -127,7 +126,7 @@ class TodoList extends React.Component {
 
 		return (
       <div className="container">
-        <Sidebar listTitles={this.state.listTitles} onListCreate={this.handleListCreate} onListChange={this.handleListChange} />
+        <Sidebar listTitles={this.state.listTitles} currentList={this.state.currentList} onListCreate={this.handleListCreate} onListChange={this.handleListChange} />
         <div className="TodoList">
           <ListTitle onClick={this.handleListDelete} onChange={this.handleListTitleEdit} value={lTitle} />
           <ItemList items={itemList} onClick={this.handleListClick}/>
@@ -152,7 +151,7 @@ class ListTitle extends React.Component {
 		return (
 			<div className="ListTitle">
         <input type="text" value={this.props.value} onChange={this.handleChange} />
-        <div class="listDelete" onClick={this.props.onClick}>
+        <div className="listDelete noselect" onClick={this.props.onClick}>
           X
         </div>
 			</div>

@@ -31,7 +31,7 @@
   text-align: center;
 }
 
-.Sidebar button {
+.Sidebar button:hover {
   cursor: pointer;
 }
 
@@ -39,6 +39,10 @@
   padding: 0;
   margin: 0;
   list-style-type: none;
+}
+
+.Sidebar li.selected {
+  background: var(--main-button-grdnt);
 }
 
 .Sidebar li {
