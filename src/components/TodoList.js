@@ -19,6 +19,7 @@ class TodoList extends React.Component {
     this.handleListCreate = this.handleListCreate.bind(this);
     this.handleListClick = this.handleListClick.bind(this);
     this.handleListDelete = this.handleListDelete.bind(this);
+    this.handleListTitleEdit = this.handleListTitleEdit.bind(this);
   }
  
   // List deletion added, but must implement a check for when the last list is deleted
@@ -101,6 +102,20 @@ class TodoList extends React.Component {
     this.setState({currentList: index});
   }
 
+  handleListTitleEdit(value) {
+    this.setState(function(prevState, props) {
+      const index = prevState.currentList;
+      const lTitle = {title: value, id: prevState.listTitles[index].id};
+      return {
+        listTitles: [
+          ...prevState.listTitles.slice(0, index),
+          lTitle,
+          ...prevState.listTitles.slice(index + 1)
+        ]
+      }
+    });
+  }
+
 	render() {
     const itemList = this.state.itemLists[this.state.currentList]; 
     const lTitle = this.state.listTitles[this.state.currentList].title;
@@ -114,7 +129,7 @@ class TodoList extends React.Component {
       <div className="container">
         <Sidebar listTitles={this.state.listTitles} onListCreate={this.handleListCreate} onListChange={this.handleListChange} />
         <div className="TodoList">
-          <ListTitle onClick={this.handleListDelete}>{lTitle}</ListTitle>
+          <ListTitle onClick={this.handleListDelete} onChange={this.handleListTitleEdit} value={lTitle} />
           <ItemList items={itemList} onClick={this.handleListClick}/>
           <SubmissionBox onSubmit={this.handleItemSubmit} />
         </div>
@@ -124,10 +139,19 @@ class TodoList extends React.Component {
 }
 
 class ListTitle extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(event) {
+    this.props.onChange(event.target.value);
+  }
+
 	render() {
 		return (
 			<div className="ListTitle">
-				{this.props.children}
+        <input type="text" value={this.props.value} onChange={this.handleChange} />
         <div class="listDelete" onClick={this.props.onClick}>
           X
         </div>
