@@ -3,13 +3,13 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-
-  background-color: #e6ffde;
+  position: relative;
+  background-color: var(--main-bg);
   width: 95%;
 }
 
 .SubmissionBox {
-  width: 88vw;
+  width: 100%;
   height: 50px;
   display: flex;
   justify-content: space-around;
@@ -19,7 +19,7 @@
   bottom: 0;
   left: 0;
 
-  background-color: #beffa8;
+  background-color: var(--main-bg-highlight);
 }
 
 .SubmissionBox input[type="text"] {
@@ -30,7 +30,9 @@
 
 .SubmissionBox input[type="submit"] {
   width: 20%;
-  background-color: #adaeed;
+  background-color: var(--main-button-bg);
+  background: var(--main-button-grdnt);
+  color: white;
   border-radius: 30px;
   border: none;
 }
@@ -41,19 +43,21 @@
 }
 
 .ListTitle {
-  font-size: 30px;
+  font-size: 40px;
   border-bottom: 1px solid black;
+  background-color: var(--main-bg-highlight);
   width: 100%;
   text-align: center;
+  padding: 25px 0;
 }
 
 .ItemList {
   font-family: "Lucida Handwriting", cursive;
+  padding: 30px 0;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0;
 }
 
 .ListItem {

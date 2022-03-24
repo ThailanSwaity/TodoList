@@ -7,27 +7,6 @@ import reportWebVitals from './reportWebVitals';
 import TodoList from './components/TodoList';
 import Sidebar from './components/Sidebar';
 
-class Container extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {currentList: 0};
-    this.handleListChange = this.handleListChange.bind(this);
-  }
-
-  handleListChange(listIndex) {
-    this.setState({currentList: listIndex});
-  }
-  
-  render() {
-    return (
-      <div className="container">
-        <TodoList currentList={this.state.currentList}/>
-        <Sidebar onListChange={this.handleListChange} />
-      </div>
-    );
-  }
-}
-
 ReactDOM.render(
   <TodoList />,
   document.getElementById('root')

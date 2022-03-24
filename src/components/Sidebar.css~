@@ -4,9 +4,8 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  border-left: 1px solid black;
-  background-color: #beffa8;
-  width: 10vw;
+  border-right: 1px solid black;
+  background-color: var(--main-bg-sidebar); 
   overflow: scroll;
   max-height: 100vh;
   -ms-overflow-style: none; /* IE and Edge */

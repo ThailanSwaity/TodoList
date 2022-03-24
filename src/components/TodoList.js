@@ -86,12 +86,12 @@ class TodoList extends React.Component {
 
 		return (
       <div className="container">
+        <Sidebar listTitles={this.state.listTitles} onListCreate={this.handleListCreate} onListChange={this.handleListChange} />
         <div className="TodoList">
           <ListTitle>{lTitle}</ListTitle>
           <ItemList items={itemList} onClick={this.handleListClick}/>
           <SubmissionBox onSubmit={this.handleItemSubmit} />
         </div>
-        <Sidebar listTitles={this.state.listTitles} onListCreate={this.handleListCreate} onListChange={this.handleListChange} />
       </div>
 		);
 	}	

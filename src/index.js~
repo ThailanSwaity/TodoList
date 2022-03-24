@@ -21,15 +21,16 @@ class Container extends React.Component {
   render() {
     return (
       <div className="container">
-        <TodoList currentList={this.state.currentList}/>
         <Sidebar onListChange={this.handleListChange} />
+        <p>Hello?</p>
+        <TodoList currentList={this.state.currentList}/>
       </div>
     );
   }
 }
 
 ReactDOM.render(
-  <Container />,
+  <TodoList />,
   document.getElementById('root')
 );
 

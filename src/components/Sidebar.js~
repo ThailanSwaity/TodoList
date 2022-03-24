@@ -21,7 +21,6 @@ class ListsTodo extends React.Component {
 
   handleClick(event) {
     const listName = event.target.textContent;
-    console.log(event.target);
     const index = this.getIndex(listName);
     this.props.onClick(index);
   }
