@@ -20,6 +20,7 @@ class TodoList extends React.Component {
     this.handleListClick = this.handleListClick.bind(this);
     this.handleListDelete = this.handleListDelete.bind(this);
     this.handleListTitleEdit = this.handleListTitleEdit.bind(this);
+    this.handleItemDelete = this.handleItemDelete.bind(this);
   }
  
   // List deletion added, but must implement a check for when the last list is deleted
@@ -97,6 +98,23 @@ class TodoList extends React.Component {
     });
   }
 
+  handleItemDelete(itemId) {
+    this.setState(function(prevState, props) {
+      const index = this.getListItemIndex(prevState, itemId);
+      const iList = [
+        ...prevState.itemLists[prevState.currentList].slice(0, index), 
+        ...prevState.itemLists[prevState.currentList].slice(index  + 1)
+      ]
+      return {
+        itemLists: [
+          ...prevState.itemLists.slice(0, prevState.currentList),
+          iList,
+          ...prevState.itemLists.slice(prevState.currentList + 1)
+        ]
+      }
+    });
+  }
+
   handleListChange(index) {
     this.setState({currentList: index});
   }
@@ -129,7 +147,7 @@ class TodoList extends React.Component {
         <Sidebar listTitles={this.state.listTitles} currentList={this.state.currentList} onListCreate={this.handleListCreate} onListChange={this.handleListChange} />
         <div className="TodoList">
           <ListTitle onClick={this.handleListDelete} onChange={this.handleListTitleEdit} value={lTitle} />
-          <ItemList items={itemList} onClick={this.handleListClick}/>
+          <ItemList items={itemList} onDelete={this.handleItemDelete} onClick={this.handleListClick}/>
           <SubmissionBox onSubmit={this.handleItemSubmit} />
         </div>
       </div>
@@ -171,7 +189,7 @@ class ItemList extends React.Component {
 
 	render() {
 		const todoItems = this.props.items.map((item) => {
-      return <ListItem key={item.id} id={item.id} onClick={this.handleClick} itemDetail={item} />;
+      return <ListItem key={item.id} id={item.id} onClick={this.handleClick} onDelete={this.props.onDelete} itemDetail={item} />;
     });
     return (
 			<ul className="ItemList">
@@ -188,19 +206,29 @@ class ListItem extends React.Component {
     this.state = {done: false};
 
     this.handleClick = this.handleClick.bind(this);
+    this.handleItemDelete = this.handleItemDelete.bind(this);
   }
 
   handleClick(event) {
-    this.props.onClick(event.target.id);
+    if (event.target.type !== "submit") this.props.onClick(event.target.id);
   }
 
+  handleItemDelete(event) {
+    event.preventDefault();
+    this.props.onDelete(event.target.id);
+  }
+  
 	render() {
 		const color = this.props.itemDetail.color;
 		const itemBody = this.props.itemDetail.body;
     const done = this.props.itemDetail.done ? 'done' : '';
 		return (
-			<li className={"ListItem " + done} id={this.props.id} onClick={this.handleClick} style={{ color: {color} }}>
-				{itemBody}
+			<li className="ListItem" onClick={this.handleClick} id={this.props.id} style={{ color: {color} }}>
+        <div className={done} id={this.props.id}>
+          {itemBody}
+        </div>
+
+        <button className="listDeleteButton" id={this.props.id} onClick={this.handleItemDelete}>X</button>
 			</li>
 		);
 	}

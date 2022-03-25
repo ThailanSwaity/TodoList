@@ -5,7 +5,7 @@
   align-items: center;
   position: relative;
   background-color: var(--main-bg);
-  width: 95%;
+  width: 100%;
 }
 
 .SubmissionBox {
@@ -96,7 +96,28 @@
 
 .ListItem {
   width: 75%;
-  margin: 10px;
+  padding: 10px;
+  border: 1px solid var(--main-bg);
+  display: flex;
+  justify-content: space-between;
+}
+
+.ListItem:hover .listDeleteButton {
+  opacity: 1;
+}
+
+.ListItem:hover .listDeleteButton:hover {
+  cursor: pointer;
+}
+
+.ListItem:hover {
+  position: relative;
+  border: 1px solid #C0C0C0;
+}
+
+.listDeleteButton {
+  opacity: 0;
+  transition: opacity 0.1s ease-in-out;
 }
 
 .done {
@@ -107,3 +128,6 @@
   cursor: pointer;
 }
 
+.listDeleteButton {
+  border: none;
+}
