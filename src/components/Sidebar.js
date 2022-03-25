@@ -42,7 +42,12 @@ class ListsTodo extends React.Component {
     const items = this.props.items.map((item) => {
       const index = this.props.currentList;
       const cName = (this.props.items[index].id == item.id) ? "selected" : "";
-      return <SidebarItem className={cName} key={item.id} id={item.id} onClick={this.handleClick}>{this.shorten(item.title)}</SidebarItem>;
+      return (
+        <SidebarItem className={cName} key={item.id} id={item.id} onClick={this.handleClick}>
+          <div id={item.id} className="tooltip">{item.title}</div>
+          {this.shorten(item.title)}
+        </SidebarItem>
+      );
     });
     return (
       <ul className="ListsTodo">
