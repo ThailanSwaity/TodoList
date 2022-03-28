@@ -22,12 +22,10 @@
 
 .Sidebar button {
   -webkit-appearance: none;
-  width: var(--list-icon-size);
-  height: var(--list-icon-size);
+  min-width: var(--list-icon-size);
+  min-height: var(--list-icon-size);
   border-radius: 100%;
   border: 1px solid black;
-  font-size: 43px;
-  line-height: 0.9;
   text-align: center;
 }
 

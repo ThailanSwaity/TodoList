@@ -10,8 +10,8 @@ class TodoList extends React.Component {
     const currentList = JSON.parse(localStorage.getItem("currentList"));
     const newListTitleId = uuidv4();
     this.state = {
-      itemLists: (itemLists || [[]]), 
-      listTitles: (listTitles || [{title: 'Chores For Today', id: newListTitleId}]), 
+      itemLists: (itemLists || []), 
+      listTitles: (listTitles || []), 
       currentList: (currentList || 0)
     };
     this.handleItemSubmit = this.handleItemSubmit.bind(this);
@@ -134,22 +134,35 @@ class TodoList extends React.Component {
   }
 
 	render() {
-    const itemList = this.state.itemLists[this.state.currentList]; 
-    const lTitle = this.state.listTitles[this.state.currentList].title;
-
     // Use effect might be better for this use case, but the performance difference seems negligible
     localStorage.setItem("itemLists", JSON.stringify(this.state.itemLists));
     localStorage.setItem("listTitles", JSON.stringify(this.state.listTitles));
     localStorage.setItem("currentList", JSON.stringify(this.state.currentList));
-
-		return (
-      <div className="container">
-        <Sidebar listTitles={this.state.listTitles} currentList={this.state.currentList} onListCreate={this.handleListCreate} onListChange={this.handleListChange} />
+    
+    var conditionalRenderItem;
+    if (this.state.itemLists.length >= 1) {
+      const itemList = this.state.itemLists[this.state.currentList]; 
+      const lTitle = this.state.listTitles[this.state.currentList].title;
+      conditionalRenderItem = ( 
         <div className="TodoList">
           <ListTitle onClick={this.handleListDelete} onChange={this.handleListTitleEdit} value={lTitle} />
           <ItemList items={itemList} onDelete={this.handleItemDelete} onClick={this.handleListClick}/>
           <SubmissionBox onSubmit={this.handleItemSubmit} />
         </div>
+      );
+    } else {
+      const text = "<-- Click the plus icon to create a new list!";
+      conditionalRenderItem = (
+        <div className="help-container">
+          <p className="help-text">{text}</p>
+        </div>
+      );
+    }
+
+		return (
+      <div className="container">
+        <Sidebar listTitles={this.state.listTitles} currentList={this.state.currentList} onListCreate={this.handleListCreate} onListChange={this.handleListChange} />
+        {conditionalRenderItem}
       </div>
 		);
 	}	

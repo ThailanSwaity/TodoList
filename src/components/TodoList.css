@@ -129,5 +129,15 @@
 }
 
 .listDeleteButton {
+  text-align: center;
   border: none;
+}
+
+.help-container {
+  height: 100vh;
+  width: 100%;
+}
+
+.help-text {
+  margin: 32px 20px;
 }
