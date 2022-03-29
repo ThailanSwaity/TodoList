@@ -1,9 +1,14 @@
 :root {
-  --main-bg: #FCFCFC;
-  --main-bg-highlight: #99E1D9;
+  --main-bg-light: #FCFCFC;
+  --main-bg-dark: #263238;
+
+  --main-bg-highlight-light: #99E1D9;
+  --main-bg-highlight-dark: #4A148C;
+
   --main-bg-sidebar: #344055;
   --main-button-bg: #E87EA1; 
   --main-button-grdnt: linear-gradient(0deg, rgba(190,112,170,1) 0%, rgba(255,142,179,1) 100%); 
+  --list-icon-size: 50px;
 }
 
 body {
