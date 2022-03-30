@@ -8,12 +8,13 @@ class TodoList extends React.Component {
     const itemLists = JSON.parse(localStorage.getItem("itemLists"));
     const listTitles = JSON.parse(localStorage.getItem("listTitles"));
     const currentList = JSON.parse(localStorage.getItem("currentList"));
+    const darkmode = JSON.parse(localStorage.getItem("darkmode"));
     const newListTitleId = uuidv4();
     this.state = {
       itemLists: (itemLists || []), 
       listTitles: (listTitles || []), 
       currentList: (currentList || 0),
-      darkmode: false
+      darkmode: (darkmode || false)
     };
     this.handleItemSubmit = this.handleItemSubmit.bind(this);
     this.handleListChange = this.handleListChange.bind(this);
@@ -148,7 +149,8 @@ class TodoList extends React.Component {
     localStorage.setItem("itemLists", JSON.stringify(this.state.itemLists));
     localStorage.setItem("listTitles", JSON.stringify(this.state.listTitles));
     localStorage.setItem("currentList", JSON.stringify(this.state.currentList));
-    
+    localStorage.setItem("darkmode", JSON.stringify(this.state.darkmode));
+
     const dMode = (this.state.darkmode) ? 'dark' : 'light';
     var conditionalRenderItem;
     if (this.state.itemLists.length >= 1) {
