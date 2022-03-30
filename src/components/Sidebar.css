@@ -12,6 +12,18 @@
   scrollbar-width: none; /* Firefox */
 }
 
+.Sidebar.dark li {
+  opacity: .8;
+}
+
+.Sidebar.dark button {
+  opacity: .8;
+}
+
+.Sidebar.dark li.selected {
+  background: var(--dark-button-bg-color);
+}
+
 .Sidebar::-webkit-scrollbar {
   display: none;
 }

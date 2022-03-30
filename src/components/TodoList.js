@@ -159,7 +159,7 @@ class TodoList extends React.Component {
       conditionalRenderItem = ( 
         <div className={"TodoList " + dMode}>
           <ListTitle viewmode={dMode} onToggle={this.handleDarkmodeToggle} onClick={this.handleListDelete} onChange={this.handleListTitleEdit} value={lTitle} />
-          <ItemList items={itemList} onDelete={this.handleItemDelete} onClick={this.handleListClick}/>
+          <ItemList viewmode={this.state.darkmode} items={itemList} onDelete={this.handleItemDelete} onClick={this.handleListClick}/>
           <SubmissionBox viewmode={dMode} onSubmit={this.handleItemSubmit} />
         </div>
       );
@@ -174,7 +174,7 @@ class TodoList extends React.Component {
 
 		return (
       <div className="container">
-        <Sidebar listTitles={this.state.listTitles} currentList={this.state.currentList} onListCreate={this.handleListCreate} onListChange={this.handleListChange} />
+        <Sidebar viewmode={dMode} listTitles={this.state.listTitles} currentList={this.state.currentList} onListCreate={this.handleListCreate} onListChange={this.handleListChange} />
         {conditionalRenderItem}
       </div>
 		);
@@ -220,7 +220,7 @@ class ItemList extends React.Component {
 
 	render() {
 		const todoItems = this.props.items.map((item) => {
-      return <ListItem key={item.id} id={item.id} onClick={this.handleClick} onDelete={this.props.onDelete} itemDetail={item} />;
+      return <ListItem viewmode={this.props.viewmode} key={item.id} id={item.id} onClick={this.handleClick} onDelete={this.props.onDelete} itemDetail={item} />;
     });
     return (
 			<ul className="ItemList">
@@ -253,8 +253,9 @@ class ListItem extends React.Component {
 		const color = this.props.itemDetail.color;
 		const itemBody = this.props.itemDetail.body;
     const done = this.props.itemDetail.done ? 'done' : '';
+    const dMode = this.props.viewmode ? 'dark' : 'light';
 		return (
-			<li className="ListItem" onClick={this.handleClick} id={this.props.id} style={{ color: {color} }}>
+			<li className={"ListItem " + dMode} onClick={this.handleClick} id={this.props.id} style={{ color: {color} }}>
         <div className={done} id={this.props.id}>
           {itemBody}
         </div>

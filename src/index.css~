@@ -1,9 +1,12 @@
 :root {
   --main-bg-light: #FCFCFC;
-  --main-bg-dark: #263238;
+  --main-bg-dark: #121212;
+
+  --dark-title-text: #916EFF;
+  --dark-button-bg-color: #9965F4;
 
   --main-bg-highlight-light: #99E1D9;
-  --main-bg-highlight-dark: #4A148C;
+  --main-bg-highlight-dark: #263238; /* #4A148C */
 
   --main-bg-sidebar: #344055;
   --main-button-bg: #E87EA1; 

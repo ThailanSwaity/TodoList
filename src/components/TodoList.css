@@ -15,6 +15,25 @@
   background-color: var(--main-bg-dark);
 }
 
+.TodoList.dark input[type="text"] {
+  color: var(--dark-title-text);
+}
+
+.TodoList.dark .listDelete {
+  background: var(--dark-button-bg-color);
+}
+
+.SubmissionBox.dark input[type="text"] {
+  background-color: var(--main-bg-dark);
+  color: white;
+  opacity: .6;
+}
+
+.SubmissionBox.dark input[type="submit"] {
+  background: var(--dark-button-bg-color);
+  color: #000000;
+}
+
 .SubmissionBox {
   width: 100%;
   height: 50px;
@@ -119,6 +138,16 @@
   justify-content: space-between;
 }
 
+.ListItem.dark {
+  color: white;
+  opacity: .6;
+}
+
+.ListItem.light {
+  color: black;
+  opacity: 1;
+}
+
 .ListItem:hover .listDeleteButton {
   opacity: 1;
 }
@@ -163,6 +192,11 @@
   background-color: var(--main-bg-light);
 }
 
+.help-container.dark p {
+  color: white;
+  opacity: .6;
+}
+
 .help-text {
   margin: 32px 20px;
 }
@@ -184,7 +218,12 @@
   justify-content: flex-end;
 }
 
+.view-mode-toggle {
+  opacity: .8;
+}
+
 .view-mode-toggle.light {
   background-color: #000000;
   color: #FFFFFF;
+  opacity: 1;
 }
