@@ -2,8 +2,8 @@
   --main-bg-light: #FCFCFC;
   --main-bg-dark: #121212;
 
-  --dark-title-text: #916EFF;
-  --dark-button-bg-color: #9965F4;
+  --dark-title-text: #9965F4;
+  --dark-button-bg-color: #B794F6;
 
   --main-bg-highlight-light: #99E1D9;
   --main-bg-highlight-dark: #263238; /* #4A148C */

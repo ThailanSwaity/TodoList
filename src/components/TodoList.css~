@@ -57,13 +57,13 @@
 }
 
 .SubmissionBox input[type="text"] {
-  width: 70%; 
+  width: 95%; 
   border: none;
   border-top: 1px solid black;
 }
 
 .SubmissionBox input[type="submit"] {
-  width: 20%;
+  min-width: 100px;
   background-color: var(--main-button-bg);
   background: var(--main-button-grdnt);
   color: white;
@@ -74,6 +74,7 @@
 .SubmissionBox input {
   height: 25px;
   border-radius: 30px;
+  margin: 0 10px;
 }
 
 .noselect {
