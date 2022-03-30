@@ -4,7 +4,7 @@ class Sidebar extends React.Component {
   render() {
     const todoLists = this.props.listTitles;
     return (
-      <div className="Sidebar">
+      <div className={"Sidebar " + this.props.viewmode}>
         <button onClick={this.props.onListCreate} className="NewListButton">+</button>
         <ListsTodo currentList={this.props.currentList} onClick={this.props.onListChange} items={todoLists}/>
       </div>

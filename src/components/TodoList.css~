@@ -4,8 +4,34 @@
   justify-content: flex-start;
   align-items: center;
   position: relative;
-  background-color: var(--main-bg);
   width: 100%;
+}
+
+.TodoList.light {
+  background-color: var(--main-bg-light);
+}
+
+.TodoList.dark {
+  background-color: var(--main-bg-dark);
+}
+
+.TodoList.dark input[type="text"] {
+  color: var(--dark-title-text);
+}
+
+.TodoList.dark .listDelete {
+  background: var(--dark-button-bg-color);
+}
+
+.SubmissionBox.dark input[type="text"] {
+  background-color: var(--main-bg-dark);
+  color: white;
+  opacity: .6;
+}
+
+.SubmissionBox.dark input[type="submit"] {
+  background: var(--dark-button-bg-color);
+  color: #000000;
 }
 
 .SubmissionBox {
@@ -22,14 +48,22 @@
   background-color: var(--main-bg-highlight);
 }
 
+.SubmissionBox.dark {
+  background-color: var(--main-bg-highlight-dark);
+}
+
+.SubmissionBox.light {
+  background-color: var(--main-bg-highlight-light);
+}
+
 .SubmissionBox input[type="text"] {
-  width: 70%; 
+  width: 95%; 
   border: none;
   border-top: 1px solid black;
 }
 
 .SubmissionBox input[type="submit"] {
-  width: 20%;
+  min-width: 100px;
   background-color: var(--main-button-bg);
   background: var(--main-button-grdnt);
   color: white;
@@ -40,6 +74,7 @@
 .SubmissionBox input {
   height: 25px;
   border-radius: 30px;
+  margin: 0 10px;
 }
 
 .noselect {
@@ -53,14 +88,9 @@
 
 .listDelete {
   background: var(--main-button-grdnt);
-  display: inline;
-  width: 30px;
-  padding: 0 15px;
-  margin: 0 15px;
-  border-radius: 10px;
 }
 
-.listDelete:hover {
+.ui-button:hover {
   cursor: pointer;
 }
 
@@ -70,9 +100,16 @@
   text-align: center;
   justify-content: flex-end;
   border-bottom: 1px solid black;
-  background-color: var(--main-bg-highlight);
   width: 100%;
   padding: 25px 0;
+}
+
+.ListTitle.dark {
+  background-color: var(--main-bg-highlight-dark);
+}
+
+.ListTitle.light {
+  background-color: var(--main-bg-highlight-light);
 }
 
 .ListTitle input[type="text"] {
@@ -97,9 +134,19 @@
 .ListItem {
   width: 75%;
   padding: 10px;
-  border: 1px solid var(--main-bg);
+  border: 1px solid transparent;
   display: flex;
   justify-content: space-between;
+}
+
+.ListItem.dark {
+  color: white;
+  opacity: .6;
+}
+
+.ListItem.light {
+  color: black;
+  opacity: 1;
 }
 
 .ListItem:hover .listDeleteButton {
@@ -129,5 +176,55 @@
 }
 
 .listDeleteButton {
+  text-align: center;
   border: none;
+}
+
+.help-container {
+  height: 100vh;
+  width: 100%;
+}
+
+.help-container.dark {
+  background-color: var(--main-bg-dark);
+}
+
+.help-container.light {
+  background-color: var(--main-bg-light);
+}
+
+.help-container.dark p {
+  color: white;
+  opacity: .6;
+}
+
+.help-text {
+  margin: 32px 20px;
+}
+
+.view-mode-toggle {
+ background-color: #FFFFFF;
+}
+
+.ui-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  display: inline;
+  margin: 0 7px;
+}
+
+.ui-button-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.view-mode-toggle {
+  opacity: .8;
+}
+
+.view-mode-toggle.light {
+  background-color: #000000;
+  color: #FFFFFF;
+  opacity: 1;
 }

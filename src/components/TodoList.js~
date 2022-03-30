@@ -8,11 +8,13 @@ class TodoList extends React.Component {
     const itemLists = JSON.parse(localStorage.getItem("itemLists"));
     const listTitles = JSON.parse(localStorage.getItem("listTitles"));
     const currentList = JSON.parse(localStorage.getItem("currentList"));
+    const darkmode = JSON.parse(localStorage.getItem("darkmode"));
     const newListTitleId = uuidv4();
     this.state = {
-      itemLists: (itemLists || [[]]), 
-      listTitles: (listTitles || [{title: 'Chores For Today', id: newListTitleId}]), 
-      currentList: (currentList || 0)
+      itemLists: (itemLists || []), 
+      listTitles: (listTitles || []), 
+      currentList: (currentList || 0),
+      darkmode: (darkmode || false)
     };
     this.handleItemSubmit = this.handleItemSubmit.bind(this);
     this.handleListChange = this.handleListChange.bind(this);
@@ -21,6 +23,7 @@ class TodoList extends React.Component {
     this.handleListDelete = this.handleListDelete.bind(this);
     this.handleListTitleEdit = this.handleListTitleEdit.bind(this);
     this.handleItemDelete = this.handleItemDelete.bind(this);
+    this.handleDarkmodeToggle = this.handleDarkmodeToggle.bind(this);
   }
  
   // List deletion added, but must implement a check for when the last list is deleted
@@ -133,23 +136,46 @@ class TodoList extends React.Component {
     });
   }
 
-	render() {
-    const itemList = this.state.itemLists[this.state.currentList]; 
-    const lTitle = this.state.listTitles[this.state.currentList].title;
+  handleDarkmodeToggle() {
+    this.setState(function(prevState, props) {
+      return {
+        darkmode: !prevState.darkmode
+      }
+    });
+  }
 
+	render() {
     // Use effect might be better for this use case, but the performance difference seems negligible
     localStorage.setItem("itemLists", JSON.stringify(this.state.itemLists));
     localStorage.setItem("listTitles", JSON.stringify(this.state.listTitles));
     localStorage.setItem("currentList", JSON.stringify(this.state.currentList));
+    localStorage.setItem("darkmode", JSON.stringify(this.state.darkmode));
+
+    const dMode = (this.state.darkmode) ? 'dark' : 'light';
+    var conditionalRenderItem;
+    if (this.state.itemLists.length >= 1) {
+      const itemList = this.state.itemLists[this.state.currentList]; 
+      const lTitle = this.state.listTitles[this.state.currentList].title;
+      conditionalRenderItem = ( 
+        <div className={"TodoList " + dMode}>
+          <ListTitle viewmode={dMode} onToggle={this.handleDarkmodeToggle} onClick={this.handleListDelete} onChange={this.handleListTitleEdit} value={lTitle} />
+          <ItemList viewmode={this.state.darkmode} items={itemList} onDelete={this.handleItemDelete} onClick={this.handleListClick}/>
+          <SubmissionBox viewmode={dMode} onSubmit={this.handleItemSubmit} />
+        </div>
+      );
+    } else {
+      const text = "<-- Click the plus icon to create a new list!";
+      conditionalRenderItem = (
+        <div className={"help-container " + dMode}>
+          <p className="help-text">{text}</p>
+        </div>
+      );
+    }
 
 		return (
       <div className="container">
         <Sidebar listTitles={this.state.listTitles} currentList={this.state.currentList} onListCreate={this.handleListCreate} onListChange={this.handleListChange} />
-        <div className="TodoList">
-          <ListTitle onClick={this.handleListDelete} onChange={this.handleListTitleEdit} value={lTitle} />
-          <ItemList items={itemList} onDelete={this.handleItemDelete} onClick={this.handleListClick}/>
-          <SubmissionBox onSubmit={this.handleItemSubmit} />
-        </div>
+        {conditionalRenderItem}
       </div>
 		);
 	}	
@@ -167,10 +193,15 @@ class ListTitle extends React.Component {
 
 	render() {
 		return (
-			<div className="ListTitle">
+			<div className={"ListTitle " + this.props.viewmode}>
         <input type="text" value={this.props.value} onChange={this.handleChange} />
-        <div className="listDelete noselect" onClick={this.props.onClick}>
-          X
+        <div className="ui-button-container">
+          <div className={"ui-button view-mode-toggle noselect " + this.props.viewmode} onClick={this.props.onToggle}>
+            M
+          </div>
+          <div className="ui-button listDelete noselect" onClick={this.props.onClick}>
+            X
+          </div>
         </div>
 			</div>
 		);
@@ -189,7 +220,7 @@ class ItemList extends React.Component {
 
 	render() {
 		const todoItems = this.props.items.map((item) => {
-      return <ListItem key={item.id} id={item.id} onClick={this.handleClick} onDelete={this.props.onDelete} itemDetail={item} />;
+      return <ListItem viewmode={this.props.viewmode} key={item.id} id={item.id} onClick={this.handleClick} onDelete={this.props.onDelete} itemDetail={item} />;
     });
     return (
 			<ul className="ItemList">
@@ -222,8 +253,9 @@ class ListItem extends React.Component {
 		const color = this.props.itemDetail.color;
 		const itemBody = this.props.itemDetail.body;
     const done = this.props.itemDetail.done ? 'done' : '';
+    const dMode = this.props.viewmode ? 'dark' : 'light';
 		return (
-			<li className="ListItem" onClick={this.handleClick} id={this.props.id} style={{ color: {color} }}>
+			<li className={"ListItem " + dMode} onClick={this.handleClick} id={this.props.id} style={{ color: {color} }}>
         <div className={done} id={this.props.id}>
           {itemBody}
         </div>
@@ -258,7 +290,7 @@ class SubmissionBox extends React.Component {
 
 	render() {
 		return (
-			<form className="SubmissionBox" onSubmit={this.handleSubmit}>
+			<form className={"SubmissionBox " + this.props.viewmode} onSubmit={this.handleSubmit}>
 				<input type="text" onChange={this.handleChange} value={this.state.value} />
 				<input type="submit" value="New Entry" />
 			</form>

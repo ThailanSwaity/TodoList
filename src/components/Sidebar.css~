@@ -1,7 +1,3 @@
-:root {
-  --list-icon-size: 50px;
-}
-
 .Sidebar {
   display: flex;
   padding: 15px;
@@ -16,18 +12,28 @@
   scrollbar-width: none; /* Firefox */
 }
 
+.Sidebar.dark li {
+  opacity: .8;
+}
+
+.Sidebar.dark button {
+  opacity: .8;
+}
+
+.Sidebar.dark li.selected {
+  background: var(--dark-button-bg-color);
+}
+
 .Sidebar::-webkit-scrollbar {
   display: none;
 }
 
 .Sidebar button {
   -webkit-appearance: none;
-  width: var(--list-icon-size);
-  height: var(--list-icon-size);
+  min-width: var(--list-icon-size);
+  min-height: var(--list-icon-size);
   border-radius: 100%;
   border: 1px solid black;
-  font-size: 43px;
-  line-height: 0.9;
   text-align: center;
 }
 
