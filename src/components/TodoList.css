@@ -101,7 +101,7 @@
   justify-content: flex-end;
   border-bottom: 1px solid black;
   width: 100%;
-  padding: 25px 0;
+  padding: 7px 0;
 }
 
 .ListTitle.dark {
@@ -129,6 +129,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: scroll;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.ItemList::-webkit-scrollbar {
+  display: none;
 }
 
 .ListItem {
@@ -206,12 +213,22 @@
  background-color: #FFFFFF;
 }
 
+.darkmode-toggle {
+  background-color: #FFFFFF;
+}
+
+.dark .darkmode-toggle {
+  background-color: var(--main-bg-dark);
+}
+
 .ui-button {
-  width: 60px;
-  height: 60px;
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
   display: inline;
+  padding: 7px;
   margin: 0 7px;
+  line-height: 1;
 }
 
 .ui-button-container {
@@ -227,4 +244,14 @@
   background-color: #000000;
   color: #FFFFFF;
   opacity: 1;
+}
+
+@media only screen and (max-width: 425px) {
+  
+  .ui-button {
+    width: 30px;
+    height: 30px;
+    font-size: .6em;
+    line-height: 1.2;
+  }
 }

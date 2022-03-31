@@ -67,3 +67,26 @@
   cursor: pointer;
 }
 
+@media only screen and (max-width: 1024px) {
+  .Sidebar {
+    padding: 9px;
+  }
+}
+
+@media only screen and (max-width: 425px) {
+  .Sidebar li {
+    width: 40px;
+    height: 40px;
+    line-height: 2.5;
+  }
+
+  .Sidebar button {
+    min-width: 42px;
+    min-height: 42px;
+  }
+
+  .Sidebar {
+    padding: 7px;
+  }
+}
+
