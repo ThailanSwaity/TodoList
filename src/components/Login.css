@@ -1,0 +1,32 @@
+#login-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.6rem;
+
+  background-color: #F5F5F5;
+  height: 100vh;
+}
+
+#login-form * {
+  margin: 8px;
+}
+
+#login-form input {
+  width: 50%;
+  font-size: 1.6rem;
+  text-align: center;
+  border: none;
+  border-bottom: 1px solid black;
+}
+
+#login-form button {
+  background-color: #FFFFFF;
+  border: 1px solid black;
+  padding: 8px;
+}
+
+#login-form button:hover {
+  cursor: pointer;
+}

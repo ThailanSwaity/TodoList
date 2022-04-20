@@ -5,17 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 class TodoList extends React.Component {
   constructor(props) {
     super(props);
-    const itemLists = JSON.parse(localStorage.getItem("itemLists"));
-    const listTitles = JSON.parse(localStorage.getItem("listTitles"));
-    const currentList = JSON.parse(localStorage.getItem("currentList"));
-    const darkmode = JSON.parse(localStorage.getItem("darkmode"));
-    const newListTitleId = uuidv4();
-    this.state = {
-      itemLists: (itemLists || []), 
-      listTitles: (listTitles || []), 
-      currentList: (currentList || 0),
-      darkmode: (darkmode || false)
-    };
   }
 
 	render() {

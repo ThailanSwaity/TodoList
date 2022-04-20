@@ -1,6 +1,7 @@
 import React from 'react';
 import socketClient from 'socket.io-client';
 import TodoList from './TodoList';
+import Login from './Login';
 import { v4 as uuidv4 } from 'uuid';
 
 class DataHandler extends React.Component {
@@ -8,11 +9,14 @@ class DataHandler extends React.Component {
     super(props);
 
     this.state = { 
-      currentList: 0, 
-      itemLists: [], 
-      listTitles: [], 
-      darkmode: false, 
-      mode: 0 // Mode 0: "Guest Mode" | Mode 1: "Online Mode" 
+      currentList: JSON.parse(localStorage.getItem('currentList')), 
+      itemLists: JSON.parse(localStorage.getItem('itemLists')), 
+      listTitles: JSON.parse(localStorage.getItem('listTitles')), 
+      darkmode: JSON.parse(localStorage.getItem('darkmode')), 
+      mode: 0, // Mode 0: "Guest Mode" | Mode 1: "Online Mode"
+      loggedIn: false,
+      username: '',
+      password: ''
     };
 
     this.handleItemSubmit = this.handleItemSubmit.bind(this);
@@ -23,6 +27,11 @@ class DataHandler extends React.Component {
     this.handleListTitleEdit = this.handleListTitleEdit.bind(this);
     this.handleItemDelete = this.handleItemDelete.bind(this);
     this.handleDarkmodeToggle = this.handleDarkmodeToggle.bind(this);
+
+    this.handleUsernameChange = this.handleUsernameChange.bind(this);
+    this.handlePasswordChange = this.handlePasswordChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleGuest = this.handleGuest.bind(this);
   }
 
   // Saves all data used by the TodoList to a remote server
@@ -34,6 +43,7 @@ class DataHandler extends React.Component {
       darkmode: this.state.darkmode
     }
     this.socket.emit('save', listData);
+    console.log('Data saved to server.');
   }
 
   // Saves all data used by the TodoList to local storage as JSON objects
@@ -42,6 +52,7 @@ class DataHandler extends React.Component {
     localStorage.setItem('itemLists', JSON.stringify(this.state.itemLists));
     localStorage.setItem('listTitles', JSON.stringify(this.state.listTitles));
     localStorage.setItem('darkmode', JSON.stringify(this.state.darkmode));
+    console.log('Data saved to local storage.');
   }
 
   loadDataFromServer() {
@@ -55,6 +66,24 @@ class DataHandler extends React.Component {
       listTitles: JSON.parse(localStorage.getItem('listTitles')),
       darkmode: JSON.parse(localStorage.getItem('darkmode'))
     });
+    console.log('Data loaded from local storage.');
+  }
+
+  handleUsernameChange(event) {
+    this.setState({ username: event.target.value });
+  }
+
+  handlePasswordChange(event) {
+    this.setState({ password: event.target.value });
+  }
+
+  handleGuest(event) {
+    event.preventDefault();
+    this.setState({ loggedIn: true });
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
   }
 
   handleListDelete() {
@@ -175,6 +204,7 @@ class DataHandler extends React.Component {
   }
 
   componentDidMount() {
+    console.log('component mounted');
     this.socket = socketClient('http://127.0.0.1:8080');
 
     // The server will send data as a 'data' event, the state is then set to match the new data
@@ -195,8 +225,13 @@ class DataHandler extends React.Component {
       listTitles: this.state.listTitles,
       darkmode: this.state.darkmode
     }
-    return (
-      <TodoList listData={listData} 
+    if (this.state.mode == 0) {
+      this.saveDataToLocalStorage(); 
+    }
+    var renderObject;
+    if (this.state.loggedIn) {
+      renderObject = ( 
+        <TodoList listData={listData} 
         onItemSubmit={this.handleItemSubmit}
         onListChange={this.handleListChange}
         onListCreate={this.handleListCreate}
@@ -205,8 +240,25 @@ class DataHandler extends React.Component {
         onListTitleEdit={this.handleListTitleEdit}
         onItemDelete={this.handleItemDelete}
         onDarkmodeToggle={this.handleDarkmodeToggle} />
+      );
+    } else {
+      renderObject = (
+        <Login 
+        username={this.state.username} 
+        password={this.state.password} 
+        onUsernameChange={this.handleUsernameChange}
+        onPasswordChange={this.handlePasswordChange} 
+        onSubmit={this.handleSubmit} 
+        onGuest={this.handleGuest} />
+      );
+    }
+    return (
+      < >
+        {renderObject}
+      </ >
     )
   }
 }
 
 export default DataHandler;
+
