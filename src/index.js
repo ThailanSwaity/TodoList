@@ -4,10 +4,10 @@ import './index.css';
 import './components/TodoList.css';
 import './components/Sidebar.css';
 import reportWebVitals from './reportWebVitals';
-import TodoList from './components/TodoList';
+import DataHandler from './components/DataHandler';
 
 ReactDOM.render(
-  <TodoList />,
+  <DataHandler />,
   document.getElementById('root')
 );
 

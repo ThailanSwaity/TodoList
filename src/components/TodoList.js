@@ -16,151 +16,36 @@ class TodoList extends React.Component {
       currentList: (currentList || 0),
       darkmode: (darkmode || false)
     };
-    this.handleItemSubmit = this.handleItemSubmit.bind(this);
-    this.handleListChange = this.handleListChange.bind(this);
-    this.handleListCreate = this.handleListCreate.bind(this);
-    this.handleListClick = this.handleListClick.bind(this);
-    this.handleListDelete = this.handleListDelete.bind(this);
-    this.handleListTitleEdit = this.handleListTitleEdit.bind(this);
-    this.handleItemDelete = this.handleItemDelete.bind(this);
-    this.handleDarkmodeToggle = this.handleDarkmodeToggle.bind(this);
-  }
- 
-  // List deletion added, but must implement a check for when the last list is deleted
-  handleListDelete() {
-    this.setState(function(prevState, props) {
-      const index = prevState.currentList;
-      var iLists = [];
-      var lTitles = [];
-      for (var i = 0; i < prevState.itemLists.length; i++) {
-        if (i != index) {
-          iLists.push(prevState.itemLists[i]);
-          lTitles.push(prevState.listTitles[i]);
-        }
-      }
-      const cList = (prevState.currentList <= 0) ? 0 : (prevState.currentList - 1);
-      return {
-        itemLists: iLists,
-        listTitles: lTitles,
-        currentList: cList
-      }
-    });
-  }
-
-  handleListClick(itemId) {
-    this.setState(function(prevState, props) {
-      const iList = prevState.itemLists[prevState.currentList];
-      const index = this.getListItemIndex(prevState, itemId);
-      const aList = [...iList.slice(0, index), 
-        {body: iList[index].body, color: iList[index].color, done: !iList[index].done, id: iList[index].id}, 
-        ...iList.slice(index + 1)];
-      return {
-        itemLists: [
-          ...prevState.itemLists.splice(0, prevState.currentList),
-          aList,
-          ...prevState.itemLists.splice(prevState.currentList + 1)
-        ]
-      }
-    });
-  }
-
-  getListItemIndex(prevState, itemId) {
-    const iList = prevState.itemLists[prevState.currentList];
-    for (var i = 0; i < iList.length; i++) {
-      if (iList[i].id == itemId) {
-        return i;
-      }
-    }
-  }
-
-  handleListCreate(event) {
-    event.preventDefault();
-    this.setState(function(prevState, props) {
-      const newListIndex = prevState.itemLists.length;
-      const newListTitleId = uuidv4();
-      return {
-        itemLists: [...prevState.itemLists, []],
-        listTitles: [...prevState.listTitles, {title: `L${newListIndex}st`, id: newListTitleId}]
-      }
-    });
-  }
-
-  handleItemSubmit(value) {
-    this.setState(function(prevState, props) {
-      const index = prevState.currentList;
-      const uuid = uuidv4();
-      const iList = [...prevState.itemLists[index], {body: value, color: '#000000', done: false, id: uuid}];
-
-      return {
-        itemLists: [
-          ...prevState.itemLists.slice(0, index),
-          iList,
-          ...prevState.itemLists.slice(index + 1)
-        ]
-      };
-    });
-  }
-
-  handleItemDelete(itemId) {
-    this.setState(function(prevState, props) {
-      const index = this.getListItemIndex(prevState, itemId);
-      const iList = [
-        ...prevState.itemLists[prevState.currentList].slice(0, index), 
-        ...prevState.itemLists[prevState.currentList].slice(index  + 1)
-      ]
-      return {
-        itemLists: [
-          ...prevState.itemLists.slice(0, prevState.currentList),
-          iList,
-          ...prevState.itemLists.slice(prevState.currentList + 1)
-        ]
-      }
-    });
-  }
-
-  handleListChange(index) {
-    this.setState({currentList: index});
-  }
-
-  handleListTitleEdit(value) {
-    this.setState(function(prevState, props) {
-      const index = prevState.currentList;
-      const lTitle = {title: value, id: prevState.listTitles[index].id};
-      return {
-        listTitles: [
-          ...prevState.listTitles.slice(0, index),
-          lTitle,
-          ...prevState.listTitles.slice(index + 1)
-        ]
-      }
-    });
-  }
-
-  handleDarkmodeToggle() {
-    this.setState(function(prevState, props) {
-      return {
-        darkmode: !prevState.darkmode
-      }
-    });
   }
 
 	render() {
     // Use effect might be better for this use case, but the performance difference seems negligible
-    localStorage.setItem("itemLists", JSON.stringify(this.state.itemLists));
-    localStorage.setItem("listTitles", JSON.stringify(this.state.listTitles));
-    localStorage.setItem("currentList", JSON.stringify(this.state.currentList));
-    localStorage.setItem("darkmode", JSON.stringify(this.state.darkmode));
+    // localStorage.setItem("itemLists", JSON.stringify(this.state.itemLists));
+    // localStorage.setItem("listTitles", JSON.stringify(this.state.listTitles));
+    // localStorage.setItem("currentList", JSON.stringify(this.state.currentList));
+    // localStorage.setItem("darkmode", JSON.stringify(this.state.darkmode));
 
-    const dMode = (this.state.darkmode) ? 'dark' : 'light';
+    const dMode = (this.props.listData.darkmode) ? 'dark' : 'light';
     var conditionalRenderItem;
-    if (this.state.itemLists.length >= 1) {
-      const itemList = this.state.itemLists[this.state.currentList]; 
-      const lTitle = this.state.listTitles[this.state.currentList].title;
+    if (this.props.listData.itemLists.length >= 1) {
+      const itemList = this.props.listData.itemLists[this.props.listData.currentList]; 
+      const lTitle = this.props.listData.listTitles[this.props.listData.currentList].title;
       conditionalRenderItem = ( 
         <div className={"TodoList " + dMode}>
-          <ListTitle viewmode={dMode} onToggle={this.handleDarkmodeToggle} onClick={this.handleListDelete} onChange={this.handleListTitleEdit} value={lTitle} />
-          <ItemList viewmode={this.state.darkmode} items={itemList} onDelete={this.handleItemDelete} onClick={this.handleListClick}/>
-          <SubmissionBox viewmode={dMode} onSubmit={this.handleItemSubmit} />
+          <ListTitle 
+            viewmode={dMode} 
+            onToggle={this.props.onDarkmodeToggle} 
+            onClick={this.props.onListDelete} 
+            onChange={this.props.onListTitleEdit} 
+            value={lTitle} />
+          <ItemList 
+            viewmode={this.props.listData.darkmode} 
+            items={itemList} 
+            onDelete={this.props.onItemDelete} 
+            onClick={this.props.onListClick}/>
+          <SubmissionBox 
+            viewmode={dMode} 
+            onSubmit={this.props.onItemSubmit} />
         </div>
       );
     } else {
@@ -174,7 +59,12 @@ class TodoList extends React.Component {
 
 		return (
       <div className="container">
-        <Sidebar viewmode={dMode} listTitles={this.state.listTitles} currentList={this.state.currentList} onListCreate={this.handleListCreate} onListChange={this.handleListChange} />
+        <Sidebar 
+          viewmode={dMode} 
+          listTitles={this.props.listData.listTitles} 
+          currentList={this.props.listData.currentList} 
+          onListCreate={this.props.onListCreate} 
+          onListChange={this.props.onListChange} />
         {conditionalRenderItem}
       </div>
 		);

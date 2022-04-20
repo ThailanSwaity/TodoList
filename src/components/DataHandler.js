@@ -1,6 +1,6 @@
-import React for 'react';
+import React from 'react';
 import socketClient from 'socket.io-client';
-import TodoList from 'TodoList';
+import TodoList from './TodoList';
 import { v4 as uuidv4 } from 'uuid';
 
 class DataHandler extends React.Component {
@@ -57,7 +57,7 @@ class DataHandler extends React.Component {
     });
   }
 
-  handleListDeletion() {
+  handleListDelete() {
     this.setState(function(prevState, props) {
       const index = prevState.currentList;
       var iLists = [];
@@ -178,7 +178,7 @@ class DataHandler extends React.Component {
     this.socket = socketClient('http://127.0.0.1:8080');
 
     // The server will send data as a 'data' event, the state is then set to match the new data
-    this.socket.addEventListener('data' (listData) => {
+    this.socket.addEventListener('data', (listData) => {
       this.setState({ 
         currentList: listData.currentList,
         itemLists: listData.itemLists,
