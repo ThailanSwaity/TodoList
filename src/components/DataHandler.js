@@ -107,6 +107,7 @@ class DataHandler extends React.Component {
     this.socket.emit('Logout');
     this.setState({ 
       loggedIn: false, 
+      mode: 0,
       username: '',
       password: ''
     });
