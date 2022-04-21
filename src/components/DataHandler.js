@@ -32,6 +32,8 @@ class DataHandler extends React.Component {
     this.handlePasswordChange = this.handlePasswordChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleGuest = this.handleGuest.bind(this);
+    this.handleLogout = this.handleLogout.bind(this);
+    this.handleCreateAccount = this.handleCreateAccount.bind(this);
   }
 
   // Saves all data used by the TodoList to a remote server
@@ -77,13 +79,38 @@ class DataHandler extends React.Component {
     this.setState({ password: event.target.value });
   }
 
+  // Sets the loggedIn state to true without being logged in.
+  // This will open the TodoList and load the data in local storage.
   handleGuest(event) {
     event.preventDefault();
     this.setState({ loggedIn: true });
   }
 
+  // Sends an event to the server telling it to link this socket to the users data
   handleSubmit(event) {
     event.preventDefault();
+    const credentials = {
+      username: this.state.username,
+      password: this.state.password,
+      time: Date.now()
+    }
+    this.socket.emit('Login', credentials);
+  }
+
+  // Sends an event to the server to delink the user data from this socket
+  handleLogout(event) {
+    event.preventDefault();
+    this.socket.emit('Logout');
+    this.setState({ loggedIn: false });
+  }
+
+  handleCreateAccount(event) {
+    event.preventDefault();  
+    const credentials = {
+      username: this.state.username,
+      password: this.state.password
+    }
+    this.socket.emit('create-account', credentials);
   }
 
   handleListDelete() {
@@ -216,6 +243,15 @@ class DataHandler extends React.Component {
         darkmode: listData.darkmode
       });
     });
+
+    this.socket.addEventListener('login-response', (response) => {
+      console.log(response);
+    });
+
+    this.socket.addEventListener('login-confirm', () => {
+      this.loadDataFromServer();
+      this.setState({ loggedIn: true });
+    });
   }
 
   render() {
@@ -239,7 +275,8 @@ class DataHandler extends React.Component {
         onListDelete={this.handleListDelete}
         onListTitleEdit={this.handleListTitleEdit}
         onItemDelete={this.handleItemDelete}
-        onDarkmodeToggle={this.handleDarkmodeToggle} />
+        onDarkmodeToggle={this.handleDarkmodeToggle}
+        onLogout={this.handleLogout} />
       );
     } else {
       renderObject = (
@@ -249,7 +286,8 @@ class DataHandler extends React.Component {
         onUsernameChange={this.handleUsernameChange}
         onPasswordChange={this.handlePasswordChange} 
         onSubmit={this.handleSubmit} 
-        onGuest={this.handleGuest} />
+        onGuest={this.handleGuest}
+        onCreateAccount={this.handleCreateAccount} />
       );
     }
     return (

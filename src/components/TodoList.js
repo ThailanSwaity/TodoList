@@ -26,6 +26,7 @@ class TodoList extends React.Component {
             onToggle={this.props.onDarkmodeToggle} 
             onClick={this.props.onListDelete} 
             onChange={this.props.onListTitleEdit} 
+            onLogout={this.props.onLogout}
             value={lTitle} />
           <ItemList 
             viewmode={this.props.listData.darkmode} 
@@ -98,6 +99,9 @@ class ListTitle extends React.Component {
           </svg>
           <div className="ui-button listDelete noselect" onClick={this.props.onClick}>
             X
+          </div>
+          <div className="ui-button logout noselect" onClick={this.props.onLogout}>
+            L
           </div>
         </div>
 			</div>
