@@ -30,3 +30,14 @@
 #login-form button:hover {
   cursor: pointer;
 }
+
+#login-form .error-message {
+  margin: 0;
+  color: #FF0000;
+  font-size: 1rem;
+}
+
+#login-form .error-message.hidden {
+  margin: 8px;
+  display: none;
+}

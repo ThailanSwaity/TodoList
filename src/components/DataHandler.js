@@ -9,14 +9,16 @@ class DataHandler extends React.Component {
     super(props);
 
     this.state = { 
-      currentList: JSON.parse(localStorage.getItem('currentList')), 
-      itemLists: JSON.parse(localStorage.getItem('itemLists')), 
-      listTitles: JSON.parse(localStorage.getItem('listTitles')), 
-      darkmode: JSON.parse(localStorage.getItem('darkmode')), 
+      currentList: JSON.parse(localStorage.getItem('currentList')) || 0, 
+      itemLists: JSON.parse(localStorage.getItem('itemLists')) || [], 
+      listTitles: JSON.parse(localStorage.getItem('listTitles')) || [], 
+      darkmode: JSON.parse(localStorage.getItem('darkmode')) || false, 
       mode: 0, // Mode 0: "Guest Mode" | Mode 1: "Online Mode"
       loggedIn: false,
       username: '',
-      password: ''
+      password: '',
+      errorMessage: '',
+      showError: false
     };
 
     this.handleItemSubmit = this.handleItemSubmit.bind(this);
@@ -63,10 +65,10 @@ class DataHandler extends React.Component {
 
   loadDataFromLocalStorage() {
     this.setState({
-      currentList: JSON.parse(localStorage.getItem('currentList')),
-      itemLists: JSON.parse(localStorage.getItem('itemLists')),
-      listTitles: JSON.parse(localStorage.getItem('listTitles')),
-      darkmode: JSON.parse(localStorage.getItem('darkmode'))
+      currentList: JSON.parse(localStorage.getItem('currentList')) || 0,
+      itemLists: JSON.parse(localStorage.getItem('itemLists')) || [],
+      listTitles: JSON.parse(localStorage.getItem('listTitles')) || [],
+      darkmode: JSON.parse(localStorage.getItem('darkmode')) || false
     });
     console.log('Data loaded from local storage.');
   }
@@ -83,12 +85,14 @@ class DataHandler extends React.Component {
   // This will open the TodoList and load the data in local storage.
   handleGuest(event) {
     event.preventDefault();
-    this.setState({ loggedIn: true });
+    this.loadDataFromLocalStorage();
+    this.setState({ loggedIn: true, mode: 0, showError: false });
   }
 
   // Sends an event to the server telling it to link this socket to the users data
   handleSubmit(event) {
     event.preventDefault();
+    if (this.state.username == '' || this.state.password == '') return;
     const credentials = {
       username: this.state.username,
       password: this.state.password,
@@ -101,11 +105,16 @@ class DataHandler extends React.Component {
   handleLogout(event) {
     event.preventDefault();
     this.socket.emit('Logout');
-    this.setState({ loggedIn: false });
+    this.setState({ 
+      loggedIn: false, 
+      username: '',
+      password: ''
+    });
   }
 
   handleCreateAccount(event) {
     event.preventDefault();  
+    if (this.state.username == '' || this.state.password == '') return;
     const credentials = {
       username: this.state.username,
       password: this.state.password
@@ -142,9 +151,9 @@ class DataHandler extends React.Component {
         ...iList.slice(index + 1)];
       return {
         itemLists: [
-          ...prevState.itemLists.splice(0, prevState.currentList),
+          ...prevState.itemLists.slice(0, prevState.currentList),
           aList,
-          ...prevState.itemLists.splice(prevState.currentList + 1)
+          ...prevState.itemLists.slice(prevState.currentList + 1)
         ]
       }
     });
@@ -248,9 +257,13 @@ class DataHandler extends React.Component {
       console.log(response);
     });
 
+    this.socket.addEventListener('error-message', (error) => {
+      this.setState({ showError: true, errorMessage: error });
+    });
+
     this.socket.addEventListener('login-confirm', () => {
       this.loadDataFromServer();
-      this.setState({ loggedIn: true });
+      this.setState({ loggedIn: true, mode: 1, showError: false });
     });
   }
 
@@ -263,6 +276,8 @@ class DataHandler extends React.Component {
     }
     if (this.state.mode == 0) {
       this.saveDataToLocalStorage(); 
+    } else {
+      this.saveDataToServer();
     }
     var renderObject;
     if (this.state.loggedIn) {
@@ -287,7 +302,9 @@ class DataHandler extends React.Component {
         onPasswordChange={this.handlePasswordChange} 
         onSubmit={this.handleSubmit} 
         onGuest={this.handleGuest}
-        onCreateAccount={this.handleCreateAccount} />
+        onCreateAccount={this.handleCreateAccount} 
+        showError={this.state.showError}
+        errorMessage={this.state.errorMessage} />
       );
     }
     return (

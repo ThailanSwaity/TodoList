@@ -8,6 +8,7 @@ class Login extends React.Component {
   render() {
     return (
       <form id="login-form" onSubmit={this.props.onSubmit}>
+        <div className={"error-message" + (this.props.showError ? '' : ' hidden')}>{this.props.errorMessage}</div>
         <label htmlFor="username">Username:</label>
         <input type="text" id="username" value={this.props.username} onChange={this.props.onUsernameChange} />
         <label htmlFor="password">Password:</label>
