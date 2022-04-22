@@ -17,8 +17,7 @@ class DataHandler extends React.Component {
       loggedIn: false,
       username: '',
       password: '',
-      errorMessage: '',
-      showError: false
+      banner: { message: '', colour: '#FF0000', show: false },
     };
 
     this.handleItemSubmit = this.handleItemSubmit.bind(this);
@@ -86,13 +85,21 @@ class DataHandler extends React.Component {
   handleGuest(event) {
     event.preventDefault();
     this.loadDataFromLocalStorage();
-    this.setState({ loggedIn: true, mode: 0, showError: false });
+    this.setState(function(prevState, props) { 
+      var banner = prevState.banner;
+      banner.show = false;
+      return {
+        loggedIn: true, 
+        mode: 0, 
+        banner
+      }
+    });
   }
 
   // Sends an event to the server telling it to link this socket to the users data
   handleSubmit(event) {
     event.preventDefault();
-    if (this.state.username == '' || this.state.password == '') return;
+    if (this.state.username == '' || this.state.password == '' || !this.socket.connected) return;
     const credentials = {
       username: this.state.username,
       password: this.state.password,
@@ -115,11 +122,18 @@ class DataHandler extends React.Component {
 
   handleCreateAccount(event) {
     event.preventDefault();  
-    if (this.state.username == '' || this.state.password == '') return;
+    if (this.state.username == '' || this.state.password == '' || !this.socket.connected) return;
     const credentials = {
       username: this.state.username,
       password: this.state.password
     }
+    this.setState(function(prevState, props) {
+      var banner = prevState.banner;
+      banner.show = false;
+      return {
+        banner
+      }
+    });
     this.socket.emit('create-account', credentials);
   }
 
@@ -242,7 +256,7 @@ class DataHandler extends React.Component {
 
   componentDidMount() {
     console.log('component mounted');
-    this.socket = socketClient('http://127.0.0.1:8080');
+    this.socket = socketClient('http://10.0.0.166:8080');
 
     // The server will send data as a 'data' event, the state is then set to match the new data
     this.socket.addEventListener('data', (listData) => {
@@ -259,12 +273,53 @@ class DataHandler extends React.Component {
     });
 
     this.socket.addEventListener('error-message', (error) => {
-      this.setState({ showError: true, errorMessage: error });
+      this.displayBannerMessage(error, '#FF0000');
+    });
+
+    this.socket.addEventListener('confirmation', (response) => {
+      this.displayBannerMessage(response, '#3BC73B'); 
     });
 
     this.socket.addEventListener('login-confirm', () => {
       this.loadDataFromServer();
-      this.setState({ loggedIn: true, mode: 1, showError: false });
+      this.setState(function(prevState, props) { 
+        var banner = prevState.banner;
+        banner.show = false;
+        return {
+          loggedIn: true, 
+          mode: 1, 
+          banner
+        }
+      });
+    });
+
+    this.socket.on('connect', () => {
+      this.hideBanner();
+    });
+
+    this.socket.on('disconnect', () => {
+      this.displayBannerMessage('Lost connection to the server', '#FF0000');
+    });
+
+  }
+
+  hideBanner() {
+    this.setState(function(prevState, props) {
+      var banner = prevState.banner;
+      banner.show = false;
+      return {
+        banner
+      }
+    });
+  }
+
+  displayBannerMessage(message, colour) {
+    this.setState({
+      banner: {
+        message,
+        colour,
+        show: true
+      }
     });
   }
 
@@ -275,11 +330,15 @@ class DataHandler extends React.Component {
       listTitles: this.state.listTitles,
       darkmode: this.state.darkmode
     }
-    if (this.state.mode == 0) {
-      this.saveDataToLocalStorage(); 
-    } else {
-      this.saveDataToServer();
+
+    if (this.state.loggedIn) {
+      if (this.state.mode == 0) {
+        this.saveDataToLocalStorage(); 
+      } else {
+        this.saveDataToServer();
+      }
     }
+
     var renderObject;
     if (this.state.loggedIn) {
       renderObject = ( 
@@ -304,8 +363,7 @@ class DataHandler extends React.Component {
         onSubmit={this.handleSubmit} 
         onGuest={this.handleGuest}
         onCreateAccount={this.handleCreateAccount} 
-        showError={this.state.showError}
-        errorMessage={this.state.errorMessage} />
+        banner={this.state.banner} />
       );
     }
     return (

@@ -8,7 +8,16 @@ class Login extends React.Component {
   render() {
     return (
       <form id="login-form" onSubmit={this.props.onSubmit}>
-        <div className={"error-message" + (this.props.showError ? '' : ' hidden')}>{this.props.errorMessage}</div>
+      {
+        // Div object used for display banner text when responding to user input
+        // this.props.banner passes { message: string, show: boolean, colour: string }
+      }
+        <div 
+          style={{ color: this.props.banner.colour }} 
+          className={"error-message" + (this.props.banner.show ? '' : ' hidden')}>
+        {this.props.banner.message}
+      </div>
+
         <label htmlFor="username">Username:</label>
         <input type="text" id="username" value={this.props.username} onChange={this.props.onUsernameChange} />
         <label htmlFor="password">Password:</label>
