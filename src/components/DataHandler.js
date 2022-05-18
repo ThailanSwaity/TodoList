@@ -14,6 +14,7 @@ class DataHandler extends React.Component {
       listTitles: JSON.parse(localStorage.getItem('listTitles')) || [], 
       darkmode: JSON.parse(localStorage.getItem('darkmode')) || false, 
       mode: 0, // Mode 0: "Guest Mode" | Mode 1: "Online Mode"
+      screen: 0, // 0: Login screen | 1: todo-list screen
       loggedIn: false,
       username: '',
       password: '',
@@ -96,16 +97,22 @@ class DataHandler extends React.Component {
     });
   }
 
-  // Sends an event to the server telling it to link this socket to the users data
+  // Sends a 'Login'  event to the server with the login information
+  login(username, password) {
+    const credentials = { 
+      username, 
+      password,
+      time: Date.now() 
+    };
+    this.socket.emit('Login', credentials);
+  }
+
+  // Checks if the username or password are invalid
+  // Calls the login function if the username and password are valid
   handleSubmit(event) {
     event.preventDefault();
     if (this.state.username == '' || this.state.password == '' || !this.socket.connected) return;
-    const credentials = {
-      username: this.state.username,
-      password: this.state.password,
-      time: Date.now()
-    }
-    this.socket.emit('Login', credentials);
+    this.login(this.state.username, this.state.password);
   }
 
   // Sends an event to the server to delink the user data from this socket
@@ -115,6 +122,7 @@ class DataHandler extends React.Component {
     this.setState({ 
       loggedIn: false, 
       mode: 0,
+      screen: 0,
       username: '',
       password: ''
     });
@@ -268,18 +276,24 @@ class DataHandler extends React.Component {
       });
     });
 
+    // A server event used for when the server cannot confirm a login attempt
     this.socket.addEventListener('login-response', (response) => {
       console.log(response);
     });
 
+    // A server event that displays a red error message on the login screen
     this.socket.addEventListener('error-message', (error) => {
       this.displayBannerMessage(error, '#FF0000');
     });
 
+    // A server event that displays a green confirmation message on the login screen
     this.socket.addEventListener('confirmation', (response) => {
       this.displayBannerMessage(response, '#3BC73B'); 
     });
 
+    // A server event that is triggered when a login is successful
+    // The client state changes to display the todolist
+    // The banner is then hidden
     this.socket.addEventListener('login-confirm', () => {
       this.loadDataFromServer();
       this.setState(function(prevState, props) { 
@@ -288,19 +302,32 @@ class DataHandler extends React.Component {
         return {
           loggedIn: true, 
           mode: 1, 
+          screen: 1,
           banner
         }
       });
     });
 
+    // When the client regains connection the message banner on the login page is hidden
+    // The client will also attempt to log back into thier account if they have lost connection while being logged in
     this.socket.on('connect', () => {
       this.hideBanner();
+      if (!this.state.loggedIn && this.state.screen == 1) {
+        this.login(this.state.username, this.state.password);
+      }
     });
 
+    // Displays a banner message on the login screen letting the user know they have lost connection to the server
+    // Sets the loggedIn state to false
     this.socket.on('disconnect', () => {
+      this.setState({ loggedIn: false });
       this.displayBannerMessage('Lost connection to the server', '#FF0000');
     });
 
+  }
+
+  componentWillUnmount() {
+    this.socket.disconnect();
   }
 
   hideBanner() {
@@ -340,7 +367,7 @@ class DataHandler extends React.Component {
     }
 
     var renderObject;
-    if (this.state.loggedIn) {
+    if (this.state.screen == 1) {
       renderObject = ( 
         <TodoList listData={listData} 
         onItemSubmit={this.handleItemSubmit}
