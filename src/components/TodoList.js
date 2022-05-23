@@ -1,12 +1,7 @@
 import React from 'react';
 import Sidebar from './Sidebar';
-import { v4 as uuidv4 } from 'uuid';
 
 class TodoList extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
 	render() {
     // Use effect might be better for this use case, but the performance difference seems negligible
     // localStorage.setItem("itemLists", JSON.stringify(this.state.itemLists));
@@ -27,7 +22,7 @@ class TodoList extends React.Component {
             onClick={this.props.onListDelete} 
             onChange={this.props.onListTitleEdit} 
             onLogout={this.props.onLogout}
-            value={lTitle} />
+            title={lTitle} />
           <ItemList 
             viewmode={this.props.listData.darkmode} 
             items={itemList} 
@@ -64,6 +59,7 @@ class TodoList extends React.Component {
 class ListTitle extends React.Component {
   constructor(props) {
     super(props);
+
     this.handleChange = this.handleChange.bind(this);
   }
 
@@ -75,7 +71,7 @@ class ListTitle extends React.Component {
     const fillColour = (this.props.viewmode == 'dark') ? '#9965F4' : '#000000';
 		return (
 			<div className={"ListTitle " + this.props.viewmode}>
-        <input type="text" value={this.props.value} onChange={this.handleChange} />
+        <input type="text" value={this.props.title} onChange={this.handleChange} />
         <div className="ui-button-container">
           
           <svg className="ui-button darkmode-toggle" onClick={this.props.onToggle} version="1.0" xmlns="http://www.w3.org/2000/svg"

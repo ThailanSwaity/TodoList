@@ -14,11 +14,13 @@ class DataHandler extends React.Component {
       listTitles: JSON.parse(localStorage.getItem('listTitles')) || [], 
       darkmode: JSON.parse(localStorage.getItem('darkmode')) || false, 
       mode: 0, // Mode 0: "Guest Mode" | Mode 1: "Online Mode"
-      screen: 0, // 0: Login screen | 1: todo-list screen
+      screen: 0, // 0: "Login screen" | 1: "todo-list screen"
       loggedIn: false,
       username: '',
       password: '',
       banner: { message: '', colour: '#FF0000', show: false },
+      unsavedData: false,
+      saveIntervalId: 0
     };
 
     this.handleItemSubmit = this.handleItemSubmit.bind(this);
@@ -36,9 +38,12 @@ class DataHandler extends React.Component {
     this.handleGuest = this.handleGuest.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
     this.handleCreateAccount = this.handleCreateAccount.bind(this);
+
+    this.saveData = this.saveData.bind(this);
   }
 
   // Saves all data used by the TodoList to a remote server
+  // Sends a 'save' event, carrying the list data to the server
   saveDataToServer() {
     const listData = {
       currentList: this.state.currentList,
@@ -48,21 +53,27 @@ class DataHandler extends React.Component {
     }
     this.socket.emit('save', listData);
     console.log('Data saved to server.');
+    this.setState({ unsavedData: false });
   }
 
   // Saves all data used by the TodoList to local storage as JSON objects
+  // Each state object is stored "individually"
   saveDataToLocalStorage() {
     localStorage.setItem('currentList', JSON.stringify(this.state.currentList));  
     localStorage.setItem('itemLists', JSON.stringify(this.state.itemLists));
     localStorage.setItem('listTitles', JSON.stringify(this.state.listTitles));
     localStorage.setItem('darkmode', JSON.stringify(this.state.darkmode));
     console.log('Data saved to local storage.');
+    this.setState({ unsavedData: false });
   }
 
+  // Sends a 'load' event to the server
+  // The server will either response with a 'data' or 'error-message' event
   loadDataFromServer() {
     this.socket.emit('load'); // Sends a load request to the server
   }
 
+  // Loads all of the list data into the state using the localStorage methods
   loadDataFromLocalStorage() {
     this.setState({
       currentList: JSON.parse(localStorage.getItem('currentList')) || 0,
@@ -92,12 +103,14 @@ class DataHandler extends React.Component {
       return {
         loggedIn: true, 
         mode: 0, 
+        screen: 1,
         banner
       }
     });
   }
 
   // Sends a 'Login'  event to the server with the login information
+  // The server will either respond with 'login-confirm' or 'error-message' events
   login(username, password) {
     const credentials = { 
       username, 
@@ -115,9 +128,11 @@ class DataHandler extends React.Component {
     this.login(this.state.username, this.state.password);
   }
 
-  // Sends an event to the server to delink the user data from this socket
+  // Sends an event to the server to delink the user data from this socket.
+  // The user will then be returned to the login screen and the username and password states are reset
   handleLogout(event) {
     event.preventDefault();
+    this.saveData();
     this.socket.emit('Logout');
     this.setState({ 
       loggedIn: false, 
@@ -128,6 +143,10 @@ class DataHandler extends React.Component {
     });
   }
 
+  // Checks to make sure the input fields are valid and the client is connected to the server
+  // If all previous conditions are met:
+  // The banner is hidden and the client sends a 'create-account' event to the server
+  // Which either responds with 'confirmation' or 'error-message' if it is successful or unsuccessful respectively 
   handleCreateAccount(event) {
     event.preventDefault();  
     if (this.state.username == '' || this.state.password == '' || !this.socket.connected) return;
@@ -145,6 +164,8 @@ class DataHandler extends React.Component {
     this.socket.emit('create-account', credentials);
   }
 
+  // Pushes all list titles and items to two seperate arrays iLists and lTitles,
+  // it does not push the data at the index of the list you are removing
   handleListDelete() {
     this.setState(function(prevState, props) {
       const index = prevState.currentList;
@@ -160,11 +181,14 @@ class DataHandler extends React.Component {
       return {
         itemLists: iLists,
         listTitles: lTitles,
-        currentList: cList
+        currentList: cList,
+        unsavedData: true
       }
     });
   }
 
+  // Changes the property of a listItem object when clicked.
+  // The itemId is given, the array are restructured to deal with the way react merges states
   handleListClick(itemId) {
     this.setState(function(prevState, props) {
       const iList = prevState.itemLists[prevState.currentList];
@@ -177,11 +201,15 @@ class DataHandler extends React.Component {
           ...prevState.itemLists.slice(0, prevState.currentList),
           aList,
           ...prevState.itemLists.slice(prevState.currentList + 1)
-        ]
+        ],
+        unsavedData: true
       }
     });
   }
 
+  // Given an item id, the function iterates through the currently selected list to find 
+  // the index of a list item with a certain id
+  // return: integer
   getListItemIndex(prevState, itemId) {
     const iList = prevState.itemLists[prevState.currentList];
     for (var i = 0; i < iList.length; i++) {
@@ -191,6 +219,7 @@ class DataHandler extends React.Component {
     }
   }
 
+  // Creates new itemList and listTitle objects, gives the title id a uuid, and inserts the objects into the array
   handleListCreate(event) {
     event.preventDefault();
     this.setState(function(prevState, props) {
@@ -198,11 +227,14 @@ class DataHandler extends React.Component {
       const newListTitleId = uuidv4();
       return {
         itemLists: [...prevState.itemLists, []],
-        listTitles: [...prevState.listTitles, {title: `L${newListIndex}st`, id: newListTitleId}]
+        listTitles: [...prevState.listTitles, {title: `L${newListIndex}st`, id: newListTitleId}],
+        unsavedData: true
       }
     });
   }
 
+  // Creates a new list item object, gives it a uuid, and inserts it at the end of the itemList array
+  // This function causes the itemLists array to restructure
   handleItemSubmit(value) {
     this.setState(function(prevState, props) {
       const index = prevState.currentList;
@@ -214,7 +246,8 @@ class DataHandler extends React.Component {
           ...prevState.itemLists.slice(0, index),
           iList,
           ...prevState.itemLists.slice(index + 1)
-        ]
+        ],
+        unsavedData: true
       }
     });
   }
@@ -231,13 +264,14 @@ class DataHandler extends React.Component {
           ...prevState.itemLists.slice(0, prevState.currentList),
           iList,
           ...prevState.itemLists.slice(prevState.currentList + 1)
-        ]
+        ],
+        unsavedData: true
       }
     });
   }
 
   handleListChange(index) {
-    this.setState({currentList: index});
+    this.setState({currentList: index, unsavedData: true });
   }
 
   handleListTitleEdit(value) {
@@ -249,7 +283,8 @@ class DataHandler extends React.Component {
           ...prevState.listTitles.slice(0, index),
           lTitle,
           ...prevState.listTitles.slice(index + 1)
-        ]
+        ],
+        unsavedData: true
       }
     });
   }
@@ -257,11 +292,13 @@ class DataHandler extends React.Component {
   handleDarkmodeToggle() {
     this.setState(function(prevState, props) {
       return {
-        darkmode: !prevState.darkmode
+        darkmode: !prevState.darkmode,
+        unsavedData: true
       }
     });
   }
 
+  // Function that is called when the component is displayed 'mounted' on the screen
   componentDidMount() {
     console.log('component mounted');
     this.socket = socketClient('http://10.0.0.166:8080');
@@ -274,11 +311,6 @@ class DataHandler extends React.Component {
         listTitles: listData.listTitles,
         darkmode: listData.darkmode
       });
-    });
-
-    // A server event used for when the server cannot confirm a login attempt
-    this.socket.addEventListener('login-response', (response) => {
-      console.log(response);
     });
 
     // A server event that displays a red error message on the login screen
@@ -324,12 +356,30 @@ class DataHandler extends React.Component {
       this.displayBannerMessage('Lost connection to the server', '#FF0000');
     });
 
+    // Creates an interval that auto-saves every 3 minutes
+    var id = setInterval(this.saveData, 180000);
+
+    this.setState({ saveIntervalId: id });
   }
 
+  saveData() {
+    if (!this.state.unsavedData) return;
+    if (this.state.loggedIn) {
+      if (this.state.mode == 0) {
+        this.saveDataToLocalStorage();
+      } else {
+        this.saveDataToServer();
+      }
+    }
+  }
+
+  // The function that is called just before the component is unloaded from the screen
   componentWillUnmount() {
-    this.socket.disconnect();
+    this.socket.disconnect(); // Socket is disconnected to prevent client from connecting multiple times at once
+    clearInterval(this.state.saveIntervalId); // Removes the auto-saving interval
   }
 
+  // Sets the banner.show property to false, hiding it from the screen
   hideBanner() {
     this.setState(function(prevState, props) {
       var banner = prevState.banner;
@@ -340,6 +390,8 @@ class DataHandler extends React.Component {
     });
   }
 
+  // Sets the banner.show, banner.message, and banner.colour properties in order 
+  // to show a coloured message to the user while on the log in screen
   displayBannerMessage(message, colour) {
     this.setState({
       banner: {
@@ -350,20 +402,13 @@ class DataHandler extends React.Component {
     });
   }
 
+  // Method called on mount or state change
   render() {
     const listData = {
       currentList: this.state.currentList,
       itemLists: this.state.itemLists,
       listTitles: this.state.listTitles,
       darkmode: this.state.darkmode
-    }
-
-    if (this.state.loggedIn) {
-      if (this.state.mode == 0) {
-        this.saveDataToLocalStorage(); 
-      } else {
-        this.saveDataToServer();
-      }
     }
 
     var renderObject;
